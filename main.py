@@ -1,8 +1,23 @@
+#
+#
+#
+#
+#
+#           "RealTime.py"가 최종 코드입니다.
+#           이 파일은 기능 구현 테스트 코드이니 참고용으로만.
+#
+#
+#           "new_test.py"에서 RealTime.py를 사용하는 방법을 참조하세요.
+#
+#
+#
+#
+#
+
 import json
 import websocket
 import pyaudio
 import base64
-import struct
 import threading
 import numpy as np
 import sounddevice as sd
@@ -38,15 +53,6 @@ headers = [
     "Authorization: Bearer " + OPENAI_API_KEY,
     "OpenAI-Beta: realtime=v1"
 ]
-def float_to_16bit_pcm(float32_array):
-    clipped = [max(-1.0, min(1.0, x)) for x in float32_array]
-    pcm16 = b''.join(struct.pack('<h', int(x * 32767)) for x in clipped)
-    return pcm16
-
-def base64_encode_audio(float32_array):
-    pcm_bytes = float_to_16bit_pcm(float32_array)
-    encoded = base64.b64encode(pcm_bytes).decode('ascii')
-    return encoded
 
 def on_open(ws):
     global connected
