@@ -8,7 +8,9 @@ if __name__ == '__main__':
         'setuptools -U',
         'websocket-client',
         'pyaudio',
-        'scipy'
+        'noisereduce',
+        #'scipy',
+        #'sounddevice',
         #'adaptfilt',
         #'numpy',
         #'scipy',
