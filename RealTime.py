@@ -4,6 +4,7 @@ import pyaudio
 import base64
 import threading
 import os
+import time
 
 class RealTime:
     def __init__(self, API_KEY: str=''):
@@ -121,8 +122,8 @@ class RealTime:
                 self.output = True
             print(data['response']['output'][0])
             input_data = []
-            for d in ['response']['output'][0]:
-                if d["type"] == "function_call":
+            for d in data['response']['output']:        # 응답의 output 리스트 들고오기
+                if d["type"] == "function_call":        # 응답의 Type가 function 호출일때
                     print('!!!', d)
                     name = d["name"]
                     print('name', name)
@@ -131,25 +132,26 @@ class RealTime:
                     call_id = d["call_id"]
                     print('call_id', call_id)
 
-                    a = self.tools_.get(name)
+                    a = self.tools_.get(name)           # 로드한 Tools에서 응답의 function 찾기
                     print('a',a)
-                    if a:
+                    if a:                               # 로드를 성공했을때
                         try:
-                            result = a.run(call_id, args)
+                            result = a.run(call_id, args)           # 로드한 Tools에 arg를 전달하여 계산
                             print(result)
-                            input_data.append(json.dumps(result))
+                            input_data.append(json.dumps(result))   # 계산 결과물을 리스트에 저장.
                         except Exception as e: print(f'{name} Module Error! :\t{e}')
-            if len(input_data)>0:
+            if len(input_data)>0:                                   # 전달할 리스트의 수가 0이 상일떄
                 r = {
                     'type': 'response.create',
                     'response':
                     {
-                        "input": input_data,
-                        "tools": self.tools,
-                        "modalities": [ "audio", 'text' ],
-                        'model': self.model
+                        "input": input_data,                        # 전달할 리스트
+                        "tools": self.tools,                        # Tool 리스트 전달
+                        "modalities": [ "audio", 'text' ],          # 받을 응답의 종류 (음성, 텍스트)
+                        'model': self.model                         # 사용할 모델
                     },
                 }
+                ws.send(json.dumps(r))                              # 전송
 
 
         elif data['type'] == "response.audio.delta":      # 응답 중일때 오디오 데이터터
